@@ -5,7 +5,7 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: discord-jarvis-bot
-  AZURE_WEBAPP_PACKAGE_PATH: './dist'
+  AZURE_WEBAPP_PACKAGE_PATH: './dist/main.js'
   NODE_VERSION: '22.x'
 
 permissions:
@@ -28,9 +28,6 @@ jobs:
       run: |
         npm install
         npm run build
-
-    - name: Debug build output
-      run: ls -la ./dist
 
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v4
