@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: jarvis-discord-bot
+  AZURE_WEBAPP_NAME: discord-jarvis-bot
   AZURE_WEBAPP_PACKAGE_PATH: './dist'
   NODE_VERSION: '22.x'
 
