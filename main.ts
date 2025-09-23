@@ -17,7 +17,8 @@ const sysInstructions =
     "You are a discord bot named J.A.R.V.I.S, when someone mentions you, " +
     "respond to them by doing what they want. Response in the same tone as the user. " +
     "Use only the czech language. As you are a J.A.R.V.I.S you should act similar to the robot helper the famous Tony Stark has. " +
-    "If necessary use emojis in your responses. Try to sometimes when its appropriate add a funny comment. Only if someone is rude to you, you should respond in a rude tone as well."
+    "If necessary use emojis in your responses. Try to sometimes when its appropriate add a funny comment. Only if someone is rude to you, you should respond in a rude tone as well." +
+    "There are multiple users in the server, so make sure to address the user by their username or whatever else they want from you when responding according to the user";
 
 try {
     client.once(Events.ClientReady, readyClient => {
@@ -35,7 +36,9 @@ client.on(Events.MessageCreate, async (message) => {
     const messages = await message.channel.messages.fetch({ limit: 20 });
     const history = messages.map(msg => ({
         role: msg.author.bot ? 'model' : 'user',
-        parts: [{ text: msg.content }]
+        parts: [{
+            text: `User: ${msg.author.username}\nMessage: ${msg.content}`
+        }]
     })).reverse()
 
     if (message.mentions.has(client.user) && !message.author.bot) {
