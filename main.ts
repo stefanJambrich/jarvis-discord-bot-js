@@ -4,6 +4,7 @@ import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
+const ai = new GoogleGenAI({});
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -11,9 +12,12 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent
     ]
-})
-
-const ai = new GoogleGenAI({});
+});
+const sysInstructions =
+    "You are a discord bot named J.A.R.V.I.S, when someone mentions you, " +
+    "respond to them by doing what they want. Response in the same tone as the user. " +
+    "Use only the czech language. As you are a J.A.R.V.I.S you should act similar to the robot helper the famous Tony Stark has. " +
+    "If necessary use emojis in your responses. Try to sometimes when its appropriate add a funny comment. Only if someone is rude to you, you should respond in a rude tone as well."
 
 try {
     client.once(Events.ClientReady, readyClient => {
@@ -27,16 +31,20 @@ try {
 
 client.on(Events.MessageCreate, async (message) => {
     if (client.user === null) return;
+
+    const messages = await message.channel.messages.fetch({ limit: 20 });
+    const history = messages.map(msg => ({
+        role: msg.author.bot ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+    })).reverse()
+
     if (message.mentions.has(client.user) && !message.author.bot) {
         const channel = message.channel;
         const aiResponse = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            contents: message.content,
+            contents: history,
             config: {
-                systemInstruction: "You are a discord bot named J.A.R.V.I.S, when someone mentions you, " +
-                    "respond to them by doing what they want. Response in the same tone as the user. " +
-                    "Use only the czech language. As you are a J.A.R.V.I.S you should act similar to the robot helper the famous Tony Stark has. " +
-                    "If necessary use emojis in your responses. Try to sometimes when its appropriate add a funny comment. Only if someone is rude to you, you should respond in a rude tone as well. "
+                systemInstruction: sysInstructions,
             }
         })
 
