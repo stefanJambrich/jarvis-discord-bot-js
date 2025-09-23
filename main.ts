@@ -34,9 +34,7 @@ client.on(Events.MessageCreate, async (message) => {
     const messages = await message.channel.messages.fetch({ limit: 20 });
     const history = messages.map(msg => ({
         role: msg.author.bot ? 'model' : 'user',
-        parts: [{
-            text: `User: ${msg.author.username}\nMessage: ${msg.content}`
-        }]
+        parts: [{ text: msg.content }]
     })).reverse()
 
     if (message.mentions.has(client.user) && !message.author.bot) {
