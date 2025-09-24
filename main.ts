@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import { Client, Events, GatewayIntentBits } from 'discord.js'
-import { GoogleGenAI } from "@google/genai";
+import {Client, Collection, Events, GatewayIntentBits, Message} from 'discord.js'
+import {Content, GoogleGenAI, Part} from "@google/genai";
 
 dotenv.config();
 
@@ -34,14 +34,7 @@ client.on(Events.MessageCreate, async (message) => {
     const channel = message.channel;
 
     const messages = await message.channel.messages.fetch({ limit: 5 });
-    const history = messages
-        .map(msg => ({
-            role: msg.author.bot ? 'model' : 'user',
-            parts: [{
-                username: msg.author.username,
-                text: msg.content
-            }]
-        })).reverse();
+    const history = await handleHistory(messages);
 
     if (message.mentions.has(client.user) && !message.author.bot) {
         const aiResponse = await ai.models.generateContent({
@@ -56,3 +49,46 @@ client.on(Events.MessageCreate, async (message) => {
         channel.send(aiResponse.text);
     }
 })
+
+const handleHistory = async (messages: Collection<string, Message<boolean>>): Promise<Content[]> => {
+    const history: Content[] = [];
+    for (const message of messages.values()) {
+        const parts = [];
+
+        parts.push({
+            username: message.author.username,
+            text: message.content
+        })
+
+        if (message.attachments.size > 0) {
+            for (const attachment of message.attachments.values()) {
+                if (attachment.contentType?.startsWith('image/')) {
+                    if (attachment.contentType == 'image/gif') {
+                        console.error("Skipping gif image to avoid spamming the bot");
+                        continue
+                    }
+                    const imageBase64 = await handleAttachment(attachment.url);
+                    parts.push({
+                        inlineData: {
+                            mimeType: attachment.contentType,
+                            data: imageBase64
+                        }
+                    })
+                }
+            }
+        }
+
+        history.push({
+            role: message.author.bot ? 'model' : 'user',
+            parts: parts
+        })
+    }
+
+    return history.reverse();
+}
+
+const handleAttachment = async (imageUrl: string): Promise<string> => {
+    const response = await fetch(imageUrl);
+    const imageArrayBuffer = await response.arrayBuffer();
+    return Buffer.from(imageArrayBuffer).toString('base64')
+}
