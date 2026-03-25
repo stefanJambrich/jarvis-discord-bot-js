@@ -21,7 +21,12 @@ jobs:
             mkdir -p ~/jarvis-discord-bot
             cd ~/jarvis-discord-bot
             
-            git pull origin main || git clone https://github.com/${{ github.repository }}.git .
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/stefanJambrich/jarvis-discord-bot-js.git .
+            else
+              git fetch --all
+              git reset --hard origin/main
+            fi
             
             npm install --production
             
