@@ -26,5 +26,5 @@ jobs:
             npm install --production
             
             pm2 delete discord-bot || true
-            DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} pm2 start index.js --name "discord-bot"
+            DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }} GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} pm2 start index.js --name "discord-bot"
             pm2 save
