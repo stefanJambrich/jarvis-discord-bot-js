@@ -38,7 +38,7 @@ client.on(Events.MessageCreate, async (message) => {
 
     if (message.mentions.has(client.user) && !message.author.bot) {
         const aiResponse = await ai.models.generateContent({
-            model: 'gemini-2.5-pro',
+            model: 'gemini-2.5-flash',
             contents: history,
             config: {
                 systemInstruction: sysInstructions
