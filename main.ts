@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import {Client, Collection, Events, GatewayIntentBits, Message} from 'discord.js'
-import {Content, GoogleGenAI, Part} from "@google/genai";
+import {Content, GoogleGenAI} from "@google/genai";
 
 dotenv.config();
 
@@ -38,7 +38,7 @@ client.on(Events.MessageCreate, async (message) => {
 
     if (message.mentions.has(client.user) && !message.author.bot) {
         const aiResponse = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-2.5-pro',
             contents: history,
             config: {
                 systemInstruction: sysInstructions
