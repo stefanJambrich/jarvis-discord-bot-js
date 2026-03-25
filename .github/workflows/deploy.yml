@@ -1,0 +1,30 @@
+name: Deploy Discord Bot
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Droplet via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p ~/jarvis-discord-bot
+            cd ~/jarvis-discord-bot
+            
+            git pull origin main || git clone https://github.com/${{ github.repository }}.git .
+            
+            npm install --production
+            
+            pm2 delete discord-bot || true
+            DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} pm2 start index.js --name "discord-bot"
+            pm2 save
