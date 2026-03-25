@@ -29,18 +29,19 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            mkdir -p ~/jarvis-discord-bot
             cd ~/jarvis-discord-bot
             
             if [ ! -d ".git" ]; then
               git clone https://github.com/stefanJambrich/jarvis-discord-bot-js.git .
             else
               git fetch --all
-              git reset --hard origin/main
+              git reset --hard origin/master
             fi
             
-            npm install --production
+            npm install
             
-            pm2 delete discord-bot || true
+            npm run build
+            
+            pm2 delete jarvis-discord-bot || true
             DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }} GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} pm2 start main.js --name "jarvis-discord-bot"
             pm2 save
