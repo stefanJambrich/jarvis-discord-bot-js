@@ -39,9 +39,8 @@ jobs:
             fi
             
             npm install
-            
             npm run build
             
             pm2 delete jarvis-discord-bot || true
-            DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }} GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} pm2 start main.js --name "jarvis-discord-bot"
+            DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }} GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} pm2 start dist/main.js --name "jarvis-discord-bot"
             pm2 save
