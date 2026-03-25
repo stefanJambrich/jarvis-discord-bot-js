@@ -5,11 +5,22 @@ on:
     branches: [ master ]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install and Build
+        run: |
+          npm install
+          npm run build
 
       - name: Deploy to Droplet via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -31,5 +42,5 @@ jobs:
             npm install --production
             
             pm2 delete discord-bot || true
-            DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }} GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} pm2 start index.js --name "discord-bot"
+            DISCORD_BOT_TOKEN=${{ secrets.DISCORD_TOKEN }} GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} pm2 start main.js --name "jarvis-discord-bot"
             pm2 save
